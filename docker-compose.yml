@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  backend:
+    image: landing-backend
+    container_name: landing-backend
+    restart: always
+    ports:
+      - "8088:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://landing-mysql:3306/landing_db
+      SPRING_DATASOURCE_USERNAME: landing
+      SPRING_DATASOURCE_PASSWORD: landing123
+    networks:
+      - landing-net
+
+networks:
+  landing-net:
+    external: true
