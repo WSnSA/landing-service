@@ -16,13 +16,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final BCryptPasswordEncoder encoder;
+    private final MailService mailService;
 
     public AuthService(UserRepository userRepository,
                        PasswordResetTokenRepository tokenRepository,
-                       BCryptPasswordEncoder encoder) {
+                       BCryptPasswordEncoder encoder,
+                       MailService mailService) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.encoder = encoder;
+        this.mailService = mailService;
     }
 
     public User register(RegisterRequest req) {
@@ -88,9 +91,11 @@ public class AuthService {
     /* ---------- FORGOT PASSWORD ---------- */
     public void forgotPassword(ForgotPasswordRequest req) {
 
+        // 1. Хэрэглэгч шалгах
         User user = userRepository.findByEmail(req.email)
                 .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
 
+        // 2. Reset token үүсгэх
         PasswordResetToken token = new PasswordResetToken();
         token.setUser(user);
         token.setToken(UUID.randomUUID().toString());
@@ -98,9 +103,47 @@ public class AuthService {
 
         tokenRepository.save(token);
 
-        // TODO: email / sms илгээх
-        System.out.println("RESET TOKEN: " + token.getToken());
+        // 3. Reset link бэлдэх (FRONT-END URL)
+        String resetLink =
+                "http://103.87.255.135:3000/reset-password?token=" + token.getToken();
+
+        // 4. HTML mail content үүсгэх
+        String html = """
+        <html>
+          <body style="font-family:Arial, sans-serif">
+            <h2>Нууц үг сэргээх</h2>
+            <p>Та доорх товч дээр дарж нууц үгээ шинэчилнэ үү.</p>
+
+            <a href="%s"
+               style="display:inline-block;
+                      padding:10px 16px;
+                      background:#2563EB;
+                      color:white;
+                      text-decoration:none;
+                      border-radius:6px;
+                      margin-top:12px;">
+              Нууц үг сэргээх
+            </a>
+
+            <p style="margin-top:16px;font-size:13px;color:#555;">
+              Энэ холбоос 30 минутын хугацаанд хүчинтэй.
+            </p>
+
+            <p style="font-size:12px;color:#999;">
+              Хэрэв та энэ хүсэлтийг илгээгээгүй бол энэ мэйлийг үл тоомсорлоно уу.
+            </p>
+          </body>
+        </html>
+    """.formatted(resetLink);
+
+        // 5. MAIL ИЛГЭЭХ (CORE)
+        mailService.sendHtmlMail(
+                user.getEmail(),
+                "Нууц үг сэргээх",
+                html
+        );
     }
+
 
     /* ---------- RESET PASSWORD ---------- */
     public void resetPassword(ResetPasswordRequest req) {
