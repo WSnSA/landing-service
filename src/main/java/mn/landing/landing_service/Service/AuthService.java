@@ -105,7 +105,7 @@ public class AuthService {
 
         // 3. Reset link бэлдэх (FRONT-END URL)
         String resetLink =
-                "http://103.87.255.135:3000/reset-password?token=" + token.getToken();
+                "http://localhost:5173/reset-password?token=" + token.getToken();
 
         // 4. HTML mail content үүсгэх
         String html = """
