@@ -30,14 +30,14 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build  --no-cache -t ghcr.io/bayrtsogt/landing-service:latest .
+          docker build  --no-cache -t ghcr.io/wsnsa/landing-service:latest .
 
       - name: Push Docker image
-        run: docker push --disable-content-trust=true ghcr.io/bayrtsogt/landing-service:latest
+        run: docker push --disable-content-trust=true ghcr.io/wsnsa/landing-service:latest
 
       - name: Pull Docker image
         run: |
-          docker pull ghcr.io/bayrtsogt/landing-service:latest
+          docker pull ghcr.io/wsnsa/landing-service:latest
 
       - name: Stop and remove existing container
         run: |
@@ -45,7 +45,7 @@ jobs:
 
       - name: Run Docker container
         run: |
-          docker run -d -p 8088:8088  --restart always --name landing-backend ghcr.io/bayrtsogt/landing-service:latest
+          docker run -d -p 8088:8088  --restart always --name landing-backend ghcr.io/wsnsa/landing-service:latest
 
       - name: Cleanup old Docker images
         run: |
