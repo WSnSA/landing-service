@@ -1,3 +1,27 @@
+server:
+  port: 8088
+
 spring:
-  application:
-    name: landing-service
+  datasource:
+    url: jdbc:mysql://mysql:3306/landing_db?useSSL=false&serverTimezone=UTC
+    username: landing
+    password: landing123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  sql:
+    init:
+      mode: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
