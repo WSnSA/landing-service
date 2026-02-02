@@ -1,9 +1,8 @@
 package mn.landing.landing_service.Controller;
 
+import mn.landing.landing_service.Model.*;
 import mn.landing.landing_service.Service.AuthService;
 import mn.landing.landing_service.Entity.User;
-import mn.landing.landing_service.Model.RegisterRequest;
-import mn.landing.landing_service.Model.RegisterResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +27,22 @@ public class AuthController {
                 user.getFullName(),
                 user.getRole()
         );
+    }
+
+
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        return authService.login(request);
+    }
+
+    @PostMapping("/forgot-password")
+    public void forgot(@RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+    }
+
+    @PostMapping("/reset-password")
+    public void reset(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
     }
 
     @GetMapping("/getAll")

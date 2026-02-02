@@ -1,22 +1,27 @@
 package mn.landing.landing_service.Service;
 
-import mn.landing.landing_service.Entity.User;
-import mn.landing.landing_service.Model.RegisterRequest;
-import mn.landing.landing_service.Repository.UserRepository;
+import mn.landing.landing_service.Entity.*;
+import mn.landing.landing_service.Model.*;
+import mn.landing.landing_service.Repository.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.List;
 
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final PasswordResetTokenRepository tokenRepository;
     private final BCryptPasswordEncoder encoder;
 
     public AuthService(UserRepository userRepository,
+                       PasswordResetTokenRepository tokenRepository,
                        BCryptPasswordEncoder encoder) {
         this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
         this.encoder = encoder;
     }
 
@@ -59,5 +64,64 @@ public class AuthService {
     public List<User> getAll() {
         return userRepository.findAll();
     }
+
+
+/* ---------- LOGIN ---------- */
+    public LoginResponse login(LoginRequest req) {
+
+        User user = userRepository.findByEmail(req.username)
+                .or(() -> userRepository.findByPhone(req.username))
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+
+        if (!encoder.matches(req.password, user.getPasswordHash())) {
+            throw new RuntimeException("INVALID_PASSWORD");
+        }
+
+        return new LoginResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getRole()
+        );
+    }
+
+    /* ---------- FORGOT PASSWORD ---------- */
+    public void forgotPassword(ForgotPasswordRequest req) {
+
+        User user = userRepository.findByEmail(req.email)
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+
+        PasswordResetToken token = new PasswordResetToken();
+        token.setUser(user);
+        token.setToken(UUID.randomUUID().toString());
+        token.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+
+        tokenRepository.save(token);
+
+        // TODO: email / sms илгээх
+        System.out.println("RESET TOKEN: " + token.getToken());
+    }
+
+    /* ---------- RESET PASSWORD ---------- */
+    public void resetPassword(ResetPasswordRequest req) {
+
+        if (!req.newPassword.equals(req.confirmPassword)) {
+            throw new RuntimeException("PASSWORD_NOT_MATCH");
+        }
+
+        PasswordResetToken token = tokenRepository.findByToken(req.token)
+                .orElseThrow(() -> new RuntimeException("INVALID_TOKEN"));
+
+        if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("TOKEN_EXPIRED");
+        }
+
+        User user = token.getUser();
+        user.setPasswordHash(encoder.encode(req.newPassword));
+        userRepository.save(user);
+
+        tokenRepository.delete(token);
+    }
 }
+
 
