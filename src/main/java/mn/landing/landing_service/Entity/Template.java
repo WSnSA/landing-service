@@ -1,29 +1,29 @@
 package mn.landing.landing_service.Entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import java.time.LocalDateTime;
-
-
+@Getter
+@Setter
 @Entity
-@Table(name = "templates")
-public class Template {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Table(name = "templates", indexes = {
+        @Index(name = "idx_templates_type", columnList = "type")
+})
+public class Template extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String type; // business, wedding, etc
 
-    @Column(nullable = false)
-    private String description; // business, wedding, etc
+    @Column(nullable = false, length = 500)
+    private String description;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     private String schemaJson;
-
-    private LocalDateTime createdAt = LocalDateTime.now();
 }

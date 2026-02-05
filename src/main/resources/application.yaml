@@ -35,3 +35,31 @@ management:
       exposure:
         include: health,info
 
+app:
+  cors:
+    allowed-origins: "http://localhost:5173"
+  jwt:
+    secret: "YESUNBILEG_HAMGIIN_HUURHUN_NI"
+    access-exp-minutes: 15
+    refresh-exp-days: 14
+  frontend:
+    reset-password-url: "http://localhost:5173/reset-password"
+  payment:
+    provider: MOCK         # дараа нь QPAY болгоно
+    manual-enabled: true   # production дээр true байлгах бол ADMIN-оор л ашиглагдана
+  plans:
+    FREE:
+      maxLandings: 1
+      maxDomains: 0
+      allowCustomDomain: false
+      allowPublish: true
+    PRO:
+      maxLandings: 5
+      maxDomains: 3
+      allowCustomDomain: true
+      allowPublish: true
+    BUSINESS:
+      maxLandings: 9999
+      maxDomains: 50
+      allowCustomDomain: true
+      allowPublish: true

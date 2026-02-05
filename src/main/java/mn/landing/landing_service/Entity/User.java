@@ -1,20 +1,25 @@
 package mn.landing.landing_service.Entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
-@Table(name = "users")
-public class User {
+@Table(
+        name = "users",
+        indexes = {
+                @Index(name = "idx_users_email", columnList = "email"),
+                @Index(name = "idx_users_phone", columnList = "phone")
+        }
+)
+public class User extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String fullName;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 255)
     private String email;
 
     @Column(nullable = false, length = 10, unique = true)
@@ -23,31 +28,10 @@ public class User {
     @Column(nullable = false, length = 15, unique = true)
     private String phone; // Утас
 
-    @Column(nullable = false)
-    private String passwordHash;
+    @Column(nullable = false, length = 100)
+    private String passwordHash; // BCrypt ~60 chars
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private Role role = Role.USER;
-
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    // getters setters
-    public Long getId() { return id; }
-
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getRegisterNumber() { return registerNumber; }
-    public void setRegisterNumber(String registerNumber) { this.registerNumber = registerNumber; }
-
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
-
-    public String getPasswordHash() { return passwordHash; }
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-
-    public Role getRole() { return role; }
 }
