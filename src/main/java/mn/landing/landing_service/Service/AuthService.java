@@ -5,7 +5,7 @@ import mn.landing.landing_service.Model.*;
 import mn.landing.landing_service.Repository.*;
 import mn.landing.landing_service.Security.JwtService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -19,9 +19,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final BCryptPasswordEncoder encoder;
     private final MailService mailService;
     private final JwtService jwtService;
+    private final PasswordEncoder encoder;
 
     @Value("${app.jwt.refresh-exp-days:14}")
     private long refreshExpDays;
@@ -32,7 +32,7 @@ public class AuthService {
     public AuthService(UserRepository userRepository,
                        PasswordResetTokenRepository tokenRepository,
                        RefreshTokenRepository refreshTokenRepository,
-                       BCryptPasswordEncoder encoder,
+                       PasswordEncoder encoder,
                        MailService mailService,
                        JwtService jwtService) {
         this.userRepository = userRepository;
@@ -185,7 +185,7 @@ public class AuthService {
 
             <p style="margin-top:16px;font-size:13px;color:#555;">
               Энэ холбоос 30 минутын хугацаанд хүчинтэй.
-            </p>Xn 
+            </p>
 
             <p style="font-size:12px;color:#999;">
               Хэрэв та энэ хүсэлтийг илгээгээгүй бол энэ мэйлийг үл тоомсорлоно уу.

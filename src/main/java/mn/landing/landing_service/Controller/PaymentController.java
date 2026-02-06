@@ -36,7 +36,10 @@ public class PaymentController {
     @GetMapping("/me")
     public List<PaymentSummaryResponse> myPayments() {
         User me = currentUserService.requireUser();
-        return paymentRepository.findBySubscription_User_IdAndDeletedFalseOrderByCreatedAtDesc(me.getId())
+
+        // ✅ ТАНАЙХ одоогоор PaymentRepository дээр subscription->user шүүлт байгаа тул үүнийг ашиглав.
+        return paymentRepository
+                .findBySubscription_User_IdAndDeletedFalseOrderByCreatedAtDesc(me.getId())
                 .stream()
                 .map(p -> new PaymentSummaryResponse(
                         p.getId(),
