@@ -43,7 +43,8 @@ app:
     access-exp-minutes: 15
     refresh-exp-days: 14
   frontend:
-    reset-password-url: "http://localhost:5173/reset-password"
+#    reset-password-url: "http://localhost:5173/reset-password"
+    reset-password-url: "http://http://103.87.255.135:5173/reset-password"
   payment:
     provider: MOCK         # дараа нь QPAY болгоно
     manual-enabled: true   # production дээр true байлгах бол ADMIN-оор л ашиглагдана
