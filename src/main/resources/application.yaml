@@ -39,7 +39,7 @@ app:
   cors:
     allowed-origins: "http://localhost:5173"
   jwt:
-    secret: "YESUNBILEG_HAMGIIN_HUURHUN_NI"
+    secret: "YESUNBILEG_HAMGIIN_HUURHUN_NI_SUPER_SECRET_KEY_2026"
     access-exp-minutes: 15
     refresh-exp-days: 14
   frontend:
