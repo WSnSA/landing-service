@@ -6,11 +6,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlanCatalog {
 
-    // FREE
+    // ✅ FREE (default: publish=false)
     @Value("${app.plans.FREE.maxLandings:1}") private int freeMaxLandings;
     @Value("${app.plans.FREE.maxDomains:0}") private int freeMaxDomains;
     @Value("${app.plans.FREE.allowCustomDomain:false}") private boolean freeAllowCustomDomain;
-    @Value("${app.plans.FREE.allowPublish:true}") private boolean freeAllowPublish;
+    @Value("${app.plans.FREE.allowPublish:false}") private boolean freeAllowPublish;
 
     // PRO
     @Value("${app.plans.PRO.maxLandings:5}") private int proMaxLandings;

@@ -18,15 +18,21 @@ public class LandingService {
 
     private final LandingRepository landingRepository;
     private final TemplateRepository templateRepository;
+    private final SubscriptionGuard subscriptionGuard;
 
     public LandingService(LandingRepository landingRepository,
-                          TemplateRepository templateRepository) {
+                          TemplateRepository templateRepository,
+                          SubscriptionGuard subscriptionGuard) {
         this.landingRepository = landingRepository;
         this.templateRepository = templateRepository;
+        this.subscriptionGuard = subscriptionGuard;
     }
 
     @Transactional
     public LandingResponse create(User user, CreateLandingRequest req) {
+
+        // ✅ PLAN LIMIT: maxLandings
+        subscriptionGuard.assertCanCreateLanding(user);
 
         String slug = SlugUtil.normalize(req.slug);
         if (slug == null || slug.isBlank()) {
@@ -51,7 +57,6 @@ public class LandingService {
             Template tpl = templateRepository.findById(req.templateId)
                     .orElseThrow(() -> new RuntimeException("TEMPLATE_NOT_FOUND"));
             landing.setTemplate(tpl);
-            // landing.setConfigJson(tpl.getSchemaJson()); // хүсвэл initial state
         }
 
         Landing saved = landingRepository.save(landing);
@@ -117,6 +122,13 @@ public class LandingService {
     public LandingResponse publish(User user, Long id) {
         Landing landing = landingRepository.findByIdAndOwnerAndDeletedFalse(id, user)
                 .orElseThrow(() -> new RuntimeException("LANDING_NOT_FOUND"));
+
+        // ✅ PLAN LIMIT: allowPublish (төлбөр төлөөгүй бол энд унаж billing рүү явна)
+        subscriptionGuard.assertCanPublish(user);
+
+        if (landing.getStatus() == LandingStatus.PUBLISHED) {
+            return toResponse(landing); // idempotent
+        }
 
         landing.setStatus(LandingStatus.PUBLISHED);
         landing.setPublishedAt(LocalDateTime.now());
