@@ -1,0 +1,65 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Landing.mn — Локал хөгжүүлэлтийн орчин
+#
+# Эхлүүлэх:
+#   docker compose -f docker-compose.dev.yml up -d
+#
+# Зогсоох:
+#   docker compose -f docker-compose.dev.yml down
+#
+# Бүгдийг дата хамт устгах:
+#   docker compose -f docker-compose.dev.yml down -v
+# ──────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── MySQL 8 ──────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: landing_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: landing_db
+      MYSQL_USER: landing
+      MYSQL_PASSWORD: landing123
+    ports:
+      - "3307:3306"
+    volumes:
+      - landing_mysql_data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+08:00
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "landing", "-planding123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── phpMyAdmin — DB харах UI (http://localhost:8081) ─────────────────────────
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: landing_phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: landing
+      PMA_PASSWORD: landing123
+    ports:
+      - "8081:80"
+
+  # ── MailHog — Имэйл тест (http://localhost:8025) ─────────────────────────────
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: landing_mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+
+volumes:
+  landing_mysql_data:

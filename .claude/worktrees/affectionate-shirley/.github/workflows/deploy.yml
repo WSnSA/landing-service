@@ -45,7 +45,7 @@ jobs:
 
       - name: Run Docker container
         run: |
-          docker run -d -p 8088:8088 --restart always --name landing-backend ghcr.io/wsnsa/landing-service:latest
+          docker run -d -p 8088:8088  --restart always --name landing-backend ghcr.io/wsnsa/landing-service:latest
 
       - name: Cleanup old Docker images
         run: |

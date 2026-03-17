@@ -16,14 +16,20 @@ public class SubscriptionGuard {
     }
 
     public void assertCanCreateLanding(User user) {
-        // No limit — free to create
+        PlanLimits limits = subscriptionService.getLimits(user);
+        long current = landingRepository.countByOwnerAndDeletedFalse(user);
+        if (current >= limits.getMaxLandings()) throw new RuntimeException("PLAN_LIMIT_LANDINGS");
     }
 
     public void assertCanPublish(User user) {
-        // No limit — free to publish
+        PlanLimits limits = subscriptionService.getLimits(user);
+        if (!limits.isAllowPublish()) throw new RuntimeException("PLAN_LIMIT_PUBLISH");
     }
 
+    // DomainService хийсний дараа ашиглана:
     public void assertCanAddCustomDomain(User user, long currentDomains) {
-        // No limit — free to add custom domain
+        PlanLimits limits = subscriptionService.getLimits(user);
+        if (!limits.isAllowCustomDomain()) throw new RuntimeException("PLAN_LIMIT_CUSTOM_DOMAIN");
+        if (currentDomains >= limits.getMaxDomains()) throw new RuntimeException("PLAN_LIMIT_DOMAINS");
     }
 }

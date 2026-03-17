@@ -1,0 +1,66 @@
+server:
+  port: 8088
+
+spring:
+  datasource:
+    url: jdbc:mysql://172.16.0.55:3306/landing_db?useSSL=false&serverTimezone=UTC
+    username: landing
+    password: landing123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    generate-ddl: true
+
+  sql:
+    init:
+      mode: never
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: landingmn719@gmail.com
+    password: ckbbunpknzaoeftt
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  cors:
+    allowed-origins: "http://localhost:5173"
+  jwt:
+    secret: "YESUNBILEG_HAMGIIN_HUURHUN_NI_SUPER_SECRET_KEY_2026"
+    access-exp-minutes: 15
+    refresh-exp-days: 14
+  frontend:
+#    reset-password-url: "http://localhost:5173/reset-password"
+    reset-password-url: "http://http://103.87.255.135:5173/reset-password"
+  payment:
+    provider: MOCK         # дараа нь QPAY болгоно
+    manual-enabled: true   # production дээр true байлгах бол ADMIN-оор л ашиглагдана
+  plans:
+    FREE:
+      maxLandings: 1
+      maxDomains: 0
+      allowCustomDomain: false
+      allowPublish: true
+    PRO:
+      maxLandings: 5
+      maxDomains: 3
+      allowCustomDomain: true
+      allowPublish: true
+    BUSINESS:
+      maxLandings: 9999
+      maxDomains: 50
+      allowCustomDomain: true
+      allowPublish: true

@@ -23,9 +23,6 @@ public class Template extends BaseEntity {
     @Column(nullable = false, length = 500)
     private String description;
 
-    @Column(length = 1000)
-    private String previewImageUrl;
-
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "json")
     private String schemaJson;

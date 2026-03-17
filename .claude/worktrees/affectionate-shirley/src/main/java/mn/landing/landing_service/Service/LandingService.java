@@ -8,7 +8,6 @@ import mn.landing.landing_service.Model.LandingResponse;
 import mn.landing.landing_service.Model.UpdateLandingRequest;
 import mn.landing.landing_service.Repository.LandingRepository;
 import mn.landing.landing_service.Repository.TemplateRepository;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,16 +19,13 @@ public class LandingService {
     private final LandingRepository landingRepository;
     private final TemplateRepository templateRepository;
     private final SubscriptionGuard subscriptionGuard;
-    private final TemplateService templateService;
 
     public LandingService(LandingRepository landingRepository,
                           TemplateRepository templateRepository,
-                          SubscriptionGuard subscriptionGuard,
-                          @Lazy TemplateService templateService) {
+                          SubscriptionGuard subscriptionGuard) {
         this.landingRepository = landingRepository;
         this.templateRepository = templateRepository;
         this.subscriptionGuard = subscriptionGuard;
-        this.templateService = templateService;
     }
 
     @Transactional
@@ -46,7 +42,10 @@ public class LandingService {
         if (slug.length() < 3) throw new RuntimeException("SLUG_TOO_SHORT");
         if (slug.length() > 120) throw new RuntimeException("SLUG_TOO_LONG");
         if (SlugUtil.isReserved(slug)) throw new RuntimeException("SLUG_RESERVED");
-        if (landingRepository.existsBySlugAndDeletedFalse(slug)) throw new RuntimeException("LANDING_SLUG_EXISTS");
+
+        if (landingRepository.existsBySlugAndDeletedFalse(slug)) {
+            throw new RuntimeException("LANDING_SLUG_EXISTS");
+        }
 
         Landing landing = new Landing();
         landing.setOwner(user);
@@ -54,20 +53,13 @@ public class LandingService {
         landing.setSlug(slug);
         landing.setStatus(LandingStatus.DRAFT);
 
-        Template tpl = null;
         if (req.templateId != null) {
-            tpl = templateRepository.findById(req.templateId)
+            Template tpl = templateRepository.findById(req.templateId)
                     .orElseThrow(() -> new RuntimeException("TEMPLATE_NOT_FOUND"));
             landing.setTemplate(tpl);
         }
 
         Landing saved = landingRepository.save(landing);
-
-        // Template-н бүтцийг Page/Section/Component болгон үүсгэнэ
-        if (tpl != null) {
-            templateService.applyTemplateToLanding(tpl, saved);
-        }
-
         return toResponse(saved);
     }
 

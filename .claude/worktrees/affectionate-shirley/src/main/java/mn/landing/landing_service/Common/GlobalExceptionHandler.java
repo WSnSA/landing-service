@@ -1,6 +1,5 @@
 package mn.landing.landing_service.Common;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -36,20 +35,9 @@ public class GlobalExceptionHandler {
                 .body(new ApiError("VALIDATION_ERROR", "VALIDATION_ERROR", fields));
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiError> handleIntegrity(DataIntegrityViolationException ex) {
-        String msg = ex.getMessage() == null ? "" : ex.getMessage();
-        if (msg.contains("uk_landings_slug") || msg.contains("landings.slug")) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new ApiError("LANDING_SLUG_EXISTS", "LANDING_SLUG_EXISTS"));
-        }
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ApiError("DUPLICATE_ENTRY", "DUPLICATE_ENTRY"));
-    }
-
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiError> handleRuntime(RuntimeException ex) {
-        String code = ex.getMessage() == null ? "INTERNAL_ERROR" : ex.getMessage();
+        String code = ex.getMessage() == null ? "ERROR" : ex.getMessage();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiError(code, code));
     }
 
