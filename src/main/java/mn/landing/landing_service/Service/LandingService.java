@@ -89,8 +89,15 @@ public class LandingService {
         Landing landing = landingRepository.findByIdAndOwnerAndDeletedFalse(id, user)
                 .orElseThrow(() -> new RuntimeException("LANDING_NOT_FOUND"));
 
-        // ✅ Publish policy: published үед засварлахгүй
-        assertDraftEditable(landing);
+        // configJson-г published үед ч засаж болно (агуулга шинэчлэх)
+        // Бусад талбар (name, slug) зөвхөн DRAFT үед засна
+        boolean onlyConfigUpdate = req.configJson != null
+                && req.name == null && req.slug == null
+                && req.seoTitle == null && req.seoDescription == null;
+
+        if (!onlyConfigUpdate) {
+            assertDraftEditable(landing);
+        }
 
         if (req.name != null && !req.name.isBlank()) {
             landing.setName(req.name);
@@ -171,6 +178,7 @@ public class LandingService {
                 templateId,
                 l.getSeoTitle(),
                 l.getSeoDescription(),
+                l.getConfigJson(),
                 l.getCreatedAt(),
                 l.getUpdatedAt(),
                 l.getPublishedAt()

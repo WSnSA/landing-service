@@ -14,6 +14,7 @@ public class LandingResponse {
 
     public String seoTitle;
     public String seoDescription;
+    public String configJson;
 
     public LocalDateTime createdAt;
     public LocalDateTime updatedAt;
@@ -21,6 +22,7 @@ public class LandingResponse {
 
     public LandingResponse(Long id, String name, String slug, LandingStatus status,
                            Long templateId, String seoTitle, String seoDescription,
+                           String configJson,
                            LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
         this.id = id;
         this.name = name;
@@ -29,6 +31,7 @@ public class LandingResponse {
         this.templateId = templateId;
         this.seoTitle = seoTitle;
         this.seoDescription = seoDescription;
+        this.configJson = configJson;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.publishedAt = publishedAt;
