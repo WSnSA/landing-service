@@ -7,7 +7,7 @@ spring:
     username: landing
     password: landing123
 
-
+  jpa:
     hibernate:
       ddl-auto: update
     show-sql: false

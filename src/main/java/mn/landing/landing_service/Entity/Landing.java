@@ -12,7 +12,10 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "landings", indexes = {
-        @Index(name = "idx_landings_user", columnList = "user_id")
+        @Index(name = "idx_landings_user", columnList = "user_id"),
+        // Composite index: WHERE user_id=? AND deleted=false ORDER BY created_at DESC
+        // Энэ index filesort-г арилгаж sort buffer overflow-г шийднэ
+        @Index(name = "idx_landings_list", columnList = "user_id, deleted, created_at")
 }, uniqueConstraints = {
         @UniqueConstraint(name = "uk_landings_slug", columnNames = "slug")
 })
